@@ -28,8 +28,8 @@ object RetrofitClient {
     }
 
     private val client = OkHttpClient.Builder()
-        .addInterceptor(apiKeyInterceptor)
         .addInterceptor(logging)
+        .addInterceptor(apiKeyInterceptor)
         .connectTimeout(20, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
