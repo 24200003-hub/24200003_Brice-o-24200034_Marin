@@ -22,7 +22,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.esan.diarioespacial.ui.asteroides.AsteroidesNavHost
-import com.esan.diarioespacial.ui.components.CenteredMessage
+import com.esan.diarioespacial.ui.imagenes.ImagenesNavHost
 import com.esan.diarioespacial.ui.theme.DiarioEspacialTheme
 
 class MainActivity : ComponentActivity() {
@@ -87,8 +87,7 @@ fun MainScreen() {
             modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())
         ) {
             composable(Tab.IMAGENES.route) {
-                // TODO(Alumno 1): reemplazar por la navegación de la opción Imágenes.
-                CenteredMessage("Opción Imágenes (APOD): en desarrollo por el Alumno 1.")
+                ImagenesNavHost()
             }
             composable(Tab.ASTEROIDES.route) {
                 AsteroidesNavHost()
