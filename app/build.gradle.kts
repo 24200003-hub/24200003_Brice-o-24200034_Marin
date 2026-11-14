@@ -1,7 +1,12 @@
+import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+}
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
 }
 
 android {
@@ -11,6 +16,7 @@ android {
     }
 
     defaultConfig {
+        buildConfigField("String", "NASA_API_KEY", "\"${localProps.getProperty("NASA_API_KEY", "")}\"")
         applicationId = "com.esan.diarioespacial"
         minSdk = 24
         targetSdk = 37
@@ -34,6 +40,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -57,4 +64,12 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    // Red
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    // Imágenes, navegación y ViewModel
+    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("androidx.navigation:navigation-compose:2.8.4")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
 }
