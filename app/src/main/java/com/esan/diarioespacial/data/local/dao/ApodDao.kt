@@ -38,6 +38,12 @@ interface ApodDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(items: List<ApodEntity>)
 
+    // Borra las filas que se guardaron con el marcador de la NASA ("NASA Science"
+    // y el logo) antes de existir el respaldo de science.nasa.gov. Las favoritas
+    // se conservan porque el usuario las marcó.
+    @Query("DELETE FROM apod WHERE title = 'NASA Science' AND isFavorite = 0")
+    suspend fun deleteNasaPlaceholders()
+
     // Problema que resuelve: REPLACE borra la fila vieja e inserta la nueva, y la
     // nueva viene de la API con isFavorite = false. Si se llamara a insertAll
     // directamente, cada vez que se abre la pantalla se perderían los favoritos.
