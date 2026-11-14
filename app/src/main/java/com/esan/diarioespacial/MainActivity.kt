@@ -22,7 +22,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.esan.diarioespacial.ui.asteroides.AsteroidesNavHost
-import com.esan.diarioespacial.ui.asteroides.CenteredMessage
+import com.esan.diarioespacial.ui.components.CenteredMessage
 import com.esan.diarioespacial.ui.theme.DiarioEspacialTheme
 
 class MainActivity : ComponentActivity() {
@@ -39,8 +39,8 @@ class MainActivity : ComponentActivity() {
 
 // Pestañas de la barra inferior. Cada una apunta al NavHost propio de su opción.
 private enum class Tab(val route: String, val label: String, val icon: Int) {
-    IMAGENES("imagenes", "Imágenes", android.R.drawable.ic_menu_gallery),
-    ASTEROIDES("asteroides", "Asteroides", android.R.drawable.ic_menu_compass)
+    IMAGENES("imagenes", "Imágenes", R.drawable.ic_tab_images),
+    ASTEROIDES("asteroides", "Asteroides", R.drawable.ic_tab_asteroids)
 }
 
 @Composable
