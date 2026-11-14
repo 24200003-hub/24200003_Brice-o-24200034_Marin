@@ -52,6 +52,25 @@ interface ApodApi {
 val api = RetrofitClient.create<ApodApi>()
 ```
 
+## Opción Imágenes: respaldo de APOD
+El 29/09/2026 la NASA trasladó APOD a science.nasa.gov. Desde entonces el endpoint
+del enunciado, `api.nasa.gov/planetary/apod`, devuelve para todas las fechas un
+marcador (título "NASA Science" y el logo de la NASA) en lugar de la imagen del día,
+y está previsto que se archive el 01/12/2026.
+
+Para que la app siga mostrando las imágenes reales, `ApodRepository`:
+1. Consulta primero `api.nasa.gov/planetary/apod` con la API key, como pide el enunciado.
+2. Si la respuesta es el marcador o la llamada falla, consulta el respaldo
+   `science.nasa.gov/wp-json/wp/v2/apod-basic`, que no usa API key.
+3. En los dos casos convierte el DTO a `ApodEntity` y lo guarda en Room; las pantallas
+   siguen leyendo solo desde Room.
+
+| Capa | Archivo |
+|---|---|
+| Servicio y DTO del respaldo | `data/remote/ApodScienceApi.kt`, `data/remote/dto/ApodScienceDto.kt` |
+| DTO → Entity y detección del marcador | `data/local/ApodScienceMappers.kt` |
+| Elección entre el endpoint del enunciado y el respaldo | `data/repository/ApodRepository.kt` |
+
 ## Opción Asteroides (Alumno 2)
 Consulta el feed de NeoWs de los últimos 7 días, lo guarda en Room y las pantallas
 leen siempre desde Room.
