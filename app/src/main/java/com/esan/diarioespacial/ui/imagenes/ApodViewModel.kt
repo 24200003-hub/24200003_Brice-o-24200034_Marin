@@ -7,6 +7,7 @@ import com.esan.diarioespacial.data.local.AppDatabase
 import com.esan.diarioespacial.data.local.entity.ApodEntity
 import com.esan.diarioespacial.data.remote.ApodApi
 import com.esan.diarioespacial.data.remote.RetrofitClient
+import com.esan.diarioespacial.data.remote.ScienceNasaClient
 import com.esan.diarioespacial.data.repository.ApodRepository
 import com.esan.diarioespacial.ui.components.toUserMessage
 import kotlinx.coroutines.CancellationException
@@ -30,6 +31,7 @@ class ApodViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = ApodRepository(
         api = RetrofitClient.create<ApodApi>(),
+        backupApi = ScienceNasaClient.api,
         dao = AppDatabase.getInstance(application).apodDao()
     )
 
