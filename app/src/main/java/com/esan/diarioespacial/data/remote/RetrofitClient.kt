@@ -27,9 +27,12 @@ object RetrofitClient {
         else HttpLoggingInterceptor.Level.NONE
     }
 
+    // El orden importa: los interceptores se ejecutan en el orden en que se agregan.
+    // El logging va primero para que registre la URL ANTES de que se le agregue
+    // api_key; así la clave no aparece en Logcat.
     private val client = OkHttpClient.Builder()
-        .addInterceptor(apiKeyInterceptor)
         .addInterceptor(logging)
+        .addInterceptor(apiKeyInterceptor)
         .connectTimeout(20, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
