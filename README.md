@@ -26,8 +26,12 @@ Kotlin · Jetpack Compose · Navigation Compose · Retrofit + Gson · Room · Co
 
 ## Acuerdo de coordinación
 - **Base común (Retrofit, API key, dependencias, README):** preparada por
-  Fermín Briceño en la rama `feature/base-api` (PR #1), revisada por [compañero].
-- **AppDatabase y navegación principal (barra inferior):** [quién]
+  Fermín Briceño en la rama `feature/base-api` (PR #2), revisada por Gabriela Marín.
+- **Base de datos (Room: `AppDatabase`, entidades y DAOs de las dos tablas):** preparada por
+  Gabriela Marín en la rama `feature/room` (PR #1), revisada por Fermín Briceño.
+- **Navegación principal (barra inferior):** creada en `MainActivity` junto con la opción
+  Asteroides. Cada pestaña llama al NavHost propio de su opción; la opción Imágenes
+  reemplaza su marcador de posición por su propio NavHost.
 - Cada integrante trabaja en su propia rama (`feature/imagenes`, `feature/asteroides`)
   y en archivos propios. La base común no se modifica sin avisar al otro.
 - Cada PR es revisado y aprobado por el otro integrante antes del merge a `main`.
@@ -47,3 +51,19 @@ interface ApodApi {
 
 val api = RetrofitClient.create<ApodApi>()
 ```
+
+## Opción Asteroides (Alumno 2)
+Consulta el feed de NeoWs de los últimos 7 días, lo guarda en Room y las pantallas
+leen siempre desde Room.
+
+| Capa | Archivo |
+|---|---|
+| DTO | `data/remote/dto/NeoWsDtos.kt` |
+| Servicio Retrofit | `data/remote/NeoWsApi.kt` |
+| DTO → Entity | `data/local/AsteroidMappers.kt` |
+| Entity y DAO | `data/local/entity/AsteroidEntity.kt`, `data/local/dao/AsteroidDao.kt` |
+| Repository | `data/repository/AsteroidRepository.kt` |
+| ViewModel (StateFlow) | `ui/asteroides/AsteroidViewModel.kt` |
+| Pantallas | `ui/asteroides/` (lista con filtro, detalle, "Mis asteroides") |
+| Navegación interna | `ui/asteroides/AsteroidesNavHost.kt` |
+
