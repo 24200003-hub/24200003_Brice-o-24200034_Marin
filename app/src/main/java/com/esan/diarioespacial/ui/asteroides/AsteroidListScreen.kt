@@ -1,6 +1,5 @@
 package com.esan.diarioespacial.ui.asteroides
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -10,7 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,8 +25,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.esan.diarioespacial.data.local.entity.AsteroidEntity
+import com.esan.diarioespacial.ui.components.CenteredMessage
+import com.esan.diarioespacial.ui.components.ErrorBanner
+import com.esan.diarioespacial.ui.components.LoadingBox
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,62 +48,83 @@ fun AsteroidListScreen(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             TopAppBar(
-                title = { Text("Asteroides") },
+                title = {
+                    Column {
+                        Text("Asteroides", fontWeight = FontWeight.Bold)
+                        Text(
+                            "Objetos cercanos a la Tierra · últimos 7 días",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                },
                 actions = {
                     IconButton(onClick = viewModel::refresh) {
                         Icon(Icons.Filled.Refresh, contentDescription = "Actualizar")
                     }
                     IconButton(onClick = onFavoritesClick) {
-                        Icon(Icons.Filled.Favorite, contentDescription = "Mis asteroides")
+                        Icon(
+                            Icons.Filled.Favorite,
+                            contentDescription = "Mis asteroides",
+                            tint = MaterialTheme.colorScheme.error
+                        )
                     }
                 }
             )
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
-            Row(
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
             ) {
-                Text(
-                    text = "Solo potencialmente peligrosos",
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Switch(
-                    checked = uiState.onlyHazardous,
-                    onCheckedChange = viewModel::setOnlyHazardous
-                )
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Solo potencialmente peligrosos", style = MaterialTheme.typography.bodyLarge)
+                        Text(
+                            "${asteroids.size} asteroides en la lista",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = uiState.onlyHazardous,
+                        onCheckedChange = viewModel::setOnlyHazardous
+                    )
+                }
             }
 
             // Si ya hay datos guardados mientras se actualiza, se muestra una barra
-            // fina arriba y se mantiene la lista; el círculo grande solo aparece
-            // cuando no hay nada que mostrar todavía.
+            // fina y se mantiene la lista; el indicador grande solo aparece cuando
+            // todavía no hay nada que mostrar.
             if (uiState.isLoading && asteroids.isNotEmpty()) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp))
             }
-            uiState.errorMessage?.let {
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-            }
+            uiState.errorMessage?.let { ErrorBanner(it) }
 
             when {
                 uiState.isLoading && asteroids.isEmpty() ->
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
+                    LoadingBox("Consultando a la NASA…")
 
                 asteroids.isEmpty() ->
-                    CenteredMessage(
-                        if (uiState.onlyHazardous) "No hay asteroides potencialmente peligrosos en los últimos 7 días."
-                        else "No hay asteroides para mostrar."
-                    )
+                    if (uiState.onlyHazardous) {
+                        CenteredMessage(
+                            title = "No hay asteroides potencialmente peligrosos",
+                            subtitle = "En los últimos 7 días ninguno fue clasificado como peligroso.",
+                            emoji = "🛡"
+                        )
+                    } else {
+                        CenteredMessage(
+                            title = "No hay asteroides para mostrar",
+                            subtitle = "Toca actualizar para volver a consultar.",
+                            emoji = "☄"
+                        )
+                    }
 
                 else ->
                     AsteroidList(

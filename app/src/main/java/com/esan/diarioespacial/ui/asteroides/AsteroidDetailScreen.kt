@@ -4,13 +4,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +26,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.esan.diarioespacial.ui.components.CenteredMessage
+import com.esan.diarioespacial.ui.components.FavoriteButton
+import com.esan.diarioespacial.ui.components.InfoRow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +56,7 @@ fun AsteroidDetailScreen(
                 },
                 actions = {
                     asteroid?.let { a ->
-                        FavoriteButton(isFavorite = a.isFavorite) { viewModel.toggleFavorite(a) }
+                        FavoriteButton(isFavorite = a.isFavorite, onClick = { viewModel.toggleFavorite(a) })
                     }
                 }
             )
@@ -68,26 +73,57 @@ fun AsteroidDetailScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(a.name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-            if (a.isHazardous) HazardBadge()
-            HorizontalDivider()
-            DetailRow("ID", a.id)
-            DetailRow("Fecha de aproximación", a.approachDate)
-            DetailRow("Diámetro mínimo estimado", formatNumber(a.diameterMinMeters, "m"))
-            DetailRow("Diámetro máximo estimado", formatNumber(a.diameterMaxMeters, "m"))
-            DetailRow("Velocidad relativa", formatNumber(a.velocityKmh, "km/h"))
-            DetailRow("Distancia de paso", formatNumber(a.missDistanceKm, "km"))
-            DetailRow("Potencialmente peligroso", if (a.isHazardous) "Sí" else "No")
+            // Encabezado
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (a.isHazardous) MaterialTheme.colorScheme.errorContainer
+                    else MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text("☄", style = MaterialTheme.typography.displaySmall)
+                    Text(a.name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                    Text("ID NASA: ${a.id}", style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        if (a.isHazardous) "⚠ Potencialmente peligroso" else "✓ No es potencialmente peligroso",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+            DetailSection("Aproximación") {
+                InfoRow("Fecha de aproximación", a.approachDate)
+                InfoRow("Velocidad relativa", formatNumber(a.velocityKmh, "km/h"))
+                InfoRow("Distancia de paso", formatNumber(a.missDistanceKm, "km"))
+            }
+
+            DetailSection("Tamaño estimado") {
+                InfoRow("Diámetro mínimo", formatNumber(a.diameterMinMeters, "m"))
+                InfoRow("Diámetro máximo", formatNumber(a.diameterMaxMeters, "m"))
+            }
+
+            DetailSection("Clasificación") {
+                InfoRow("Potencialmente peligroso", if (a.isHazardous) "Sí" else "No")
+            }
         }
     }
 }
 
 @Composable
-private fun DetailRow(label: String, value: String) {
-    Column {
-        Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-        Text(value, style = MaterialTheme.typography.bodyLarge)
+private fun DetailSection(title: String, content: @Composable () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(
+                title,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
+            )
+            content()
+        }
     }
 }

@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.esan.diarioespacial.data.local.entity.AsteroidEntity
+import com.esan.diarioespacial.ui.components.CenteredMessage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,8 +43,10 @@ fun AsteroidFavoritesScreen(
     ) { padding ->
         if (favorites.isEmpty()) {
             CenteredMessage(
-                "Todavía no tienes asteroides favoritos.\nMárcalos con el corazón en la lista.",
-                Modifier.padding(padding)
+                title = "Todavía no tienes asteroides favoritos",
+                subtitle = "Márcalos con el corazón en la lista o en el detalle.",
+                emoji = "♡",
+                modifier = Modifier.padding(padding)
             )
         } else {
             AsteroidList(

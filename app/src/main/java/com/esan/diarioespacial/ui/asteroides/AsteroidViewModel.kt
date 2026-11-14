@@ -8,6 +8,7 @@ import com.esan.diarioespacial.data.local.entity.AsteroidEntity
 import com.esan.diarioespacial.data.remote.NeoWsApi
 import com.esan.diarioespacial.data.remote.RetrofitClient
 import com.esan.diarioespacial.data.repository.AsteroidRepository
+import com.esan.diarioespacial.ui.components.toUserMessage
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -75,7 +76,7 @@ class AsteroidViewModel(application: Application) : AndroidViewModel(application
             } catch (e: Exception) {
                 // Sin internet, key inválida o respuesta inesperada: no se cierra la
                 // app, se muestra un mensaje y se siguen viendo los datos guardados.
-                _uiState.update { it.copy(errorMessage = "No se pudo actualizar: ${e.message}") }
+                _uiState.update { it.copy(errorMessage = e.toUserMessage()) }
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
