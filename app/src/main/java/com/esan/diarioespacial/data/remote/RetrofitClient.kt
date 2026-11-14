@@ -1,5 +1,6 @@
 package com.esan.diarioespacial.data.remote
 
+import android.util.Log
 import com.esan.diarioespacial.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -21,15 +22,23 @@ object RetrofitClient {
         chain.proceed(original.newBuilder().url(url).build())
     }
 
-    // Muestra las peticiones en Logcat solo en modo debug
-    private val logging = HttpLoggingInterceptor().apply {
+    // Muestra las peticiones en Logcat solo en modo debug.
+    // El logger propio reemplaza el valor de api_key por *** antes de imprimir:
+    // la línea de respuesta ("<-- 200 ...") muestra la URL final, que ya trae la
+    // clave, así que cambiar el orden de los interceptores no bastaba.
+    private val logging = HttpLoggingInterceptor { message ->
+        Log.d("OkHttp", message.replace(Regex("api_key=[^&\\s]+"), "api_key=***"))
+    }.apply {
         level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BASIC
         else HttpLoggingInterceptor.Level.NONE
     }
 
+    // El orden importa: los interceptores se ejecutan en el orden en que se agregan.
+    // El logging va primero para que registre la URL ANTES de que se le agregue
+    // api_key; así la clave no aparece en Logcat.
     private val client = OkHttpClient.Builder()
-        .addInterceptor(apiKeyInterceptor)
         .addInterceptor(logging)
+        .addInterceptor(apiKeyInterceptor)
         .connectTimeout(20, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
